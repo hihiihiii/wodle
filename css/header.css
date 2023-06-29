@@ -1,0 +1,24 @@
+.header-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px;
+
+  position: absolute;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-center {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.header-left {
+  width: 25px;
+  cursor: pointer;
+}
+
+.header-right img {
+  width: 25px;
+}

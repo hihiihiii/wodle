@@ -30,8 +30,15 @@ function appStart() {
     index = 0;
   };
 
-  const handleEnterKey = () => {
+  const handleEnterKey = async () => {
     let 맞은_갯수 = 0;
+
+    // 서버에서 정답을 가져오는 코드
+    const response = await fetch("/answer");
+    const answerObj = await response.json();
+    const 정답 = answerObj.answer;
+    console.log(정답);
+
     for (let i = 0; i < 5; i++) {
       const block = document.querySelector(
         `.board-block[data-index='${attempts}${i}']`
@@ -39,11 +46,11 @@ function appStart() {
 
       //입력한 값
       const letter = block.innerText;
-      const answerText = answer[i];
+      const answerText = 정답[i];
       if (letter === answerText) {
         맞은_갯수 += 1;
         block.style.background = "lime";
-      } else if (answer.includes(letter)) {
+      } else if (정답.includes(letter)) {
         block.style.background = "yellow";
       } else {
         block.style.background = "#787c7e";

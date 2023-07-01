@@ -1,8 +1,4 @@
-// 1. 5글자 단어
-// 2. 6번의 시도 가능
-// 3. 존재하면 노란색, 위치도 맞으면 초록색으로
-// 4. 게임종료 판단
-// 5. 추가(상단에 게임 시간 표시하기)
+const keyboardElement = document.querySelectorAll(".keyboard");
 
 //시도
 const answer = "APPLE";
@@ -10,6 +6,7 @@ let index = 0;
 let attempts = 0;
 
 function appStart() {
+  //게임종료시 종료 팝업
   const displayGameover = () => {
     const div = document.createElement("div");
     div.innerText = "게임이 종료되었습니다.";
@@ -18,12 +15,14 @@ function appStart() {
     document.body.appendChild(div);
   };
 
+  // 게임 종료
   const gameover = () => {
     window.removeEventListener("keydown", handlekeydown);
     displayGameover();
     clearInterval(timer);
   };
 
+  //다음줄 넘어가기
   const nextLine = () => {
     if (attempts === 5) return gameover();
     attempts += 1;
@@ -31,7 +30,19 @@ function appStart() {
   };
 
   const handleEnterKey = () => {
+    //animate
+    const newspaperSpinning = [
+      { transform: " scale(1)" },
+      { transform: " scale(1.5)" },
+    ];
+
+    const newspaperTiming = {
+      duration: 1000,
+      iterations: Infinity,
+    };
+
     let 맞은_갯수 = 0;
+
     for (let i = 0; i < 5; i++) {
       const block = document.querySelector(
         `.board-block[data-index='${attempts}${i}']`
@@ -39,17 +50,30 @@ function appStart() {
 
       //입력한 값
       const letter = block.innerText;
+
+      //키보드 매치 맞으면 색깔 바뀌는
       const answerText = answer[i];
+
+      const keyboardBlock = document.querySelector(
+        `.keyboard[data-key='${letter}']`
+      );
+
       if (letter === answerText) {
         맞은_갯수 += 1;
         block.style.background = "lime";
+        keyboardBlock.style.background = "lime";
+        block.animate(newspaperSpinning, newspaperTiming);
       } else if (answer.includes(letter)) {
         block.style.background = "yellow";
+        keyboardBlock.style.background = "yellow";
       } else {
         block.style.background = "#787c7e";
+        block.style.transform = "scale(0.8)";
+        block.style.transition = "ease-in-out 1s all";
       }
       block.style.color = "white";
     }
+
     if (맞은_갯수 === 5) gameover();
     else nextLine();
   };
@@ -69,6 +93,7 @@ function appStart() {
   const handlekeydown = (e) => {
     const key = e.key.toUpperCase();
     const keyCode = e.keyCode;
+
     const indexElement = document.querySelector(
       `.board-block[data-index='${attempts}${index}'`
     );
@@ -81,6 +106,27 @@ function appStart() {
         return;
       }
     } else if (65 <= keyCode && keyCode <= 90) {
+      indexElement.innerText = key;
+      index++;
+    }
+  };
+
+  //자판 클릭시 입력
+  const handleKeyClick = (e) => {
+    const key = e.target.attributes[1].value;
+
+    const indexElement = document.querySelector(
+      `.board-block[data-index='${attempts}${index}'`
+    );
+
+    if (key === "DELETE") handleBackSpace();
+    else if (index === 5) {
+      if (key === "ENTER") {
+        handleEnterKey();
+      } else {
+        return;
+      }
+    } else if (key !== "ENTER") {
       indexElement.innerText = key;
       index++;
     }
@@ -102,7 +148,12 @@ function appStart() {
 
     timer = setInterval(setTime, 1000);
   };
+
+  for (let i = 0; i < keyboardElement.length; i++) {
+    keyboardElement[i].addEventListener("click", handleKeyClick);
+  }
   startTimer();
+
   window.addEventListener("keydown", handlekeydown);
 }
 
